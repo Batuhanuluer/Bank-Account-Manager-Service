@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { AccountService } from './account.service';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Controller('account')
 export class AccountController {

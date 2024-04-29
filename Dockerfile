@@ -1,4 +1,4 @@
-# Ubuntu tabanlı imajı kullan
+
 FROM ubuntu:latest
 
 WORKDIR /app

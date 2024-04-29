@@ -42,7 +42,7 @@ export class AccountService {
             if (user) {
               
               const account = new Account();
-              account.accountnumber = await this.createAccountNumber(); // Rastgele hesap numarası oluşturun
+              account.accountnumber = await this.createAccountNumber(); 
               account.phone = userJson.phone;
               account.firstname = userJson.firstname;
               account.lastname = userJson.lastname;
@@ -90,10 +90,10 @@ export class AccountService {
         
 
         this.client.emit('AccountPriceChaned',mbData);
-        // Veritabanını güncelleyin
+      
         await this.accountRepository.save(account);
 
-        return account;  // Güncellenmiş hesap nesnesini döndür    
+        return account;     
       }
 
       async moneyOutflow(accountNumber : string , amount : number){
@@ -103,14 +103,14 @@ export class AccountService {
                 });
         
                 if (!account) {
-                  // Hesap bulunamazsa, uygun bir hata mesajı döndür
+                  
                   throw new NotFoundException(`Account with number ${accountNumber} not found.`);
                 }
         
                 if(account.price < amount){
                   throw new NotFoundException(`Account with number ${accountNumber} have not enough balance.`);
                 }
-                // Mevcut bakiyeyi güncelleyin
+           
                 account.price -= amount;
 
                 const mbData = {
@@ -119,32 +119,32 @@ export class AccountService {
                 }
                 this.client.emit('AccountPriceChaned',mbData);
 
-                // Veritabanını güncelleyin
+               
                 await this.accountRepository.save(account);
         
-                return account;  // Güncellenmiş hesap nesnesini döndür 
+                return account;  
       }
 
     async createAccountNumber(){
       let accountnumber: string;
     
-      // Benzersiz hesap numarası bulunana kadar tekrar et
+    
       while (true) {
-        // 16 haneli rastgele bir sayı dizisi oluşturun
+
         accountnumber = Math.floor(Math.random() * Math.pow(10, 16)).toString();
     
-        // Benzersizlik kontrolü için veritabanında sorgulama yapın
+        
         const existingAccount = await this.accountRepository.findOne({
           where: { accountnumber },
         });
     
-        // Eğer veritabanında benzeri yoksa, benzersizdir
+    
         if (!existingAccount) {
-          break;  // Benzersiz hesap numarası bulunduğunda döngüden çıkın
+          break;  
         }
       }
     
-      return accountnumber;  // Benzersiz hesap numarasını döndür
+      return accountnumber;  
     }
     
 }
