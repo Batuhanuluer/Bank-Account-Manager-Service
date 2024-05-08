@@ -36,4 +36,13 @@ export class AccountController {
     ){
         return await this.accountService.moneyOutflow(accountNumber,price);
     }
+
+    @Post('transfer')
+    async moneyTransfer(
+        @Body('targetaccount') targetaccountNumber :string,
+        @Body('price') price : number ,
+        @Body('phone') userphone : string,
+    ){
+        return await this.accountService.moneyTransfer(targetaccountNumber, userphone ,price);
+    }
 }

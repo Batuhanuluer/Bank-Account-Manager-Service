@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as Redis from 'ioredis';
 import { Account } from './account.entity';
-import { Repository } from 'typeorm';
+import { ArrayOverlap, Repository } from 'typeorm';
 import { User } from './user.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import * as dotenv from 'dotenv';
@@ -147,4 +147,43 @@ export class AccountService {
       return accountnumber;  
     }
     
+    async moneyTransfer(targetAccountNumber : string, userphone : string, changedprice : number){
+      try {
+        const mainAccount = await this.accountRepository.findOne({
+          where: { phone: userphone },
+        });
+
+        if(mainAccount.price < changedprice){
+          throw new Error('Not enough balance.')
+        }
+        
+        const targetAccount = await this.accountRepository.findOne({
+          where: { accountnumber : targetAccountNumber},
+        })
+
+        mainAccount.price -= changedprice;
+        targetAccount.price += changedprice;
+
+        const mbMainAccountData = {
+          accountnumber : mainAccount.accountnumber, 
+          accountprice : mainAccount.price
+        }
+
+        const mbTargetAccountData = {
+          accountnumber : targetAccount.accountnumber, 
+          accountprice : targetAccount.price
+        }
+
+        this.client.emit('AccountPriceChaned',mbMainAccountData);
+        this.client.emit('AccountPriceChaned',mbTargetAccountData);
+    
+        await this.accountRepository.save(mainAccount);
+        await this.accountRepository.save(targetAccount);
+
+        return mainAccount;
+
+      } catch (error) {
+        
+      }
+    }
 }
